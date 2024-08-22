@@ -1,0 +1,8 @@
+{
+    "api_key": "your_api_key",
+    "free_api": "yes",
+    "source_lang": "EN",
+    "target_lang": "DE",
+    "warn_character_limit": 50000,
+    "max_request_size": 8192
+}
