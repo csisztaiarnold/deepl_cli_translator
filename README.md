@@ -6,13 +6,11 @@ This program uses the CLI to translate text using the free or paid plan of DeepL
 
 The main reason I created this small program is because I wanted to translate a couple of subtitle files painlessly from the command line. 
 
-Since DeepL makes a much better/natural translation than Google Translate and offers a free tier with a montlhy limit of 500000 characters (which is more than enough for a couple of translations I need) - I decide to use it's Translator API for this purpose.
+Since DeepL makes a much better/natural translation than Google Translate and offers a free tier with a monthly limit of 500000 characters (which is more than enough for a couple of translations I need, but of course, if you use a paid package on DeepL, and increased character limit will apply) - I decided to use it's Translator API.
 
 It's also handy for fast and small string translations when I don't want to use Google Translate.
 
-Of course, if you use a paid package on DeepL, and increased character limit will apply.
-
-Supports only textual (`.txt`) files or strings!
+Supports only textual (`.txt`) files or string inputs!
 
 ## Features
 
@@ -46,7 +44,7 @@ Your DeepL API key. Once you register on DeepL, you could find or create a key o
 
 ### source_lang 
 
-The source language code (e.g., `"EN"` for English). Find all the supported languages on https://developers.deepl.com/docs/resources/supported-languages
+The source language code (e.g. `"EN"` for English). Find all the supported languages on https://developers.deepl.com/docs/resources/supported-languages
 
 ### target_lang
 
@@ -54,17 +52,15 @@ The same as for `source_lang`
 
 ### warn_character_limit
 
-The character limit of the input file or string at which a warning should be issued in order to avoid too huge translation requests.
+Set the character limit of the input file or string at which a warning will be issued in order to avoid too huge translation requests by accident (default is 50.000).
 
 ### max_request_size
 
-The maximum size of each request to the DeepL API. In case you get a 413 Request Entity Too Large error, decrease this number, and the request will be sent in smaller chunks to the API and merge the response.
+The maximum size of each request to the DeepL API. In case you get a `413 Request Entity Too Large` error, decrease this number, and the request will be sent in even smaller chunks to the API.
 
 ## Help
 
-```
-translator -h
-```
+`translator --help` or `translator -h`
 
 ## Usage
 
@@ -74,7 +70,7 @@ translator -api_key <key> -free_api <true|false> -input_string <text> -input_fil
 
 ### api_key
 
-DeepL API key. Optional if provided in settings.json.
+DeepL API key. Optional if provided in `settings.json`.
 
 ### free_api
 
@@ -96,11 +92,11 @@ In case it's not provided, the filename will be generated from the first 10 char
 
 ### source_lang
 
-Source language code. optional if provided in settings.json.
+Source language code. Optional if provided in `settings.json`.
 
 ### target_lang
 
-Target language code. optional if provided in settings.json.
+Target language code. Optional if provided in `settings.json`.
 
 ### output
 
