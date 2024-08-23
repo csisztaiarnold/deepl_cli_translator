@@ -14,7 +14,18 @@ import (
 	"strings"
 )
 
-const Version = "1.0.0"
+const (
+	Version                   = "1.0.0"
+	FreeAPIURL                = "https://api-free.deepl.com/v2/"
+	PaidAPIURL                = "https://api.deepl.com/v2/"
+	DefaultWarnCharacterLimit = 50000
+	DefaultMaxRequestSize     = 8192
+	DefaultFreeAPI            = "yes"
+	ErrCreatingAPIRequest     = "error creating API request: %v"
+	ErrMakingAPIRequest       = "error making API request: %v"
+	ErrDecodingAPIResponse    = "error decoding API response: %v"
+	APIErrorMsg               = "API error: %s\nStatus Code: %d\nResponse Body: %s\nPlease make sure your API key is working."
+)
 
 type Settings struct {
 	APIKey             string `json:"api_key"`
@@ -63,10 +74,10 @@ func sanitizeFilename(input string) string {
 
 // Generates the API URL based on the endpoint and whether the free or the paid API plan is specified.
 func getAPIURL(endpoint string, freeAPI string) string {
-	if freeAPI == "yes" {
-		return "https://api-free.deepl.com/v2/" + endpoint
+	if freeAPI == DefaultFreeAPI {
+		return FreeAPIURL + endpoint
 	}
-	return "https://api.deepl.com/v2/" + endpoint
+	return PaidAPIURL + endpoint
 }
 
 // Makes an API request and returns the response.
@@ -74,14 +85,14 @@ func makeAPIRequest(apiURL, apiKey string, data url.Values) (*http.Response, err
 	data.Set("auth_key", apiKey)
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return nil, fmt.Errorf("error creating API request: %v", err)
+		return nil, fmt.Errorf(ErrCreatingAPIRequest, err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error making API request: %v", err)
+		return nil, fmt.Errorf(ErrMakingAPIRequest, err)
 	}
 	return resp, nil
 }
@@ -101,12 +112,12 @@ func getRemainingCharacterLimit(apiKey string, freeAPI string) (int, error) {
 		body, _ := ioutil.ReadAll(resp.Body)
 		re := regexp.MustCompile(`<.*?>`)
 		cleanedBody := re.ReplaceAllString(string(body), "")
-		return 0, fmt.Errorf("API error: %s\nStatus Code: %d\nResponse Body: %s\nPlease make sure your API key is working.", cleanedBody, resp.StatusCode, string(body))
+		return 0, fmt.Errorf(APIErrorMsg, cleanedBody, resp.StatusCode, string(body))
 	}
 
 	var usageResp UsageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&usageResp); err != nil {
-		return 0, fmt.Errorf("error decoding API response: %v", err)
+		return 0, fmt.Errorf(ErrDecodingAPIResponse, err)
 	}
 
 	return usageResp.CharacterLimit - usageResp.CharacterCount, nil
@@ -131,12 +142,12 @@ func translateChunk(apiKey, sourceLang, targetLang string, freeAPI string, chunk
 		body, _ := ioutil.ReadAll(resp.Body)
 		re := regexp.MustCompile(`<.*?>`)
 		cleanedBody := re.ReplaceAllString(string(body), "")
-		return "", fmt.Errorf("API error: %s\nStatus Code: %d\nResponse Body: %s\nPlease make sure your API key is working.", cleanedBody, resp.StatusCode, string(body))
+		return "", fmt.Errorf(APIErrorMsg, cleanedBody, resp.StatusCode, string(body))
 	}
 
 	var deeplResp DeepLResponse
 	if err := json.NewDecoder(resp.Body).Decode(&deeplResp); err != nil {
-		return "", fmt.Errorf("error decoding API response: %v", err)
+		return "", fmt.Errorf(ErrDecodingAPIResponse, err)
 	}
 
 	return deeplResp.Translations[0].Text, nil
@@ -174,8 +185,8 @@ func main() {
 	}
 
 	settings := Settings{
-		WarnCharacterLimit: 50000,
-		MaxRequestSize:     8192,
+		WarnCharacterLimit: DefaultWarnCharacterLimit,
+		MaxRequestSize:     DefaultMaxRequestSize,
 	}
 	settingsData, err := ioutil.ReadFile("settings.json")
 	if err == nil {
@@ -191,7 +202,7 @@ func main() {
 	freeAPIValue := flag.Lookup("free_api").Value.String()
 	if freeAPIValue == "" {
 		if settings.FreeAPI == "" {
-			*freeAPI = "yes"
+			*freeAPI = DefaultFreeAPI
 		} else {
 			*freeAPI = settings.FreeAPI
 		}
