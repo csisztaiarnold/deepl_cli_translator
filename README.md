@@ -1,10 +1,16 @@
 # DeepL CLI Translator
 
-This program uses the CLI to translate text using the free or paid plan of DeepL API.
+This application translates text using the free or paid plan of DeepL API.
 
-![Translator CLI](translator.gif)
+## CLI
 
-The main reason I created this small program is because I wanted to translate a couple of subtitle files painlessly from the command line. 
+![Translator CLI](images/translator.gif)
+
+## GUI
+
+![Translator GUI](images/translator_gui.png)
+
+The main reason I created this app is because I wanted to translate a couple of subtitle files painlessly from the command line. 
 
 Since DeepL makes a much better/natural translation than Google Translate and offers a free tier with a monthly limit of 500000 characters (which is more than enough for a couple of translations I need, but of course, if you use a paid package on DeepL, and increased character limit will apply) - I decided to use it's Translator API.
 
@@ -16,9 +22,18 @@ Supports only textual (`.txt`) files or string inputs!
 
 - Translate text from an input file or a provided string.
 - Output translated text to a file or the screen.
-- After the translation is complete, the program prints the remaining character limit for the DeepL API key.
+- Displays the remaining character limit for the DeepL API key.
 - Supports both free and paid DeepL API endpoints.
 - Configurable maximum request size and character limit warnings.
+
+## Requirements
+
+- Go v1.23
+- A DeepL API key (free or paid)
+
+## Build
+
+`go build -x -o translator`
 
 ## Configuration
 
@@ -36,11 +51,9 @@ The `api_key`, the `source_lang` and the `target_lang` parameters will be overwr
     "max_request_size": 8192
 }
 ```
-
 ### api_key
 
 Your DeepL API key. Once you register on DeepL, you could find or create a key on https://www.deepl.com/en/your-account/keys
-
 
 ### source_lang 
 
@@ -65,8 +78,12 @@ The maximum size of each request to the DeepL API. In case you get a `413 Reques
 ## Usage
 
 ```
-translator -api_key <key> -free_api <true|false> -input_string <text> -input_file <path> -output_file <path> -source_lang <lang_code> -target_lang <lang_code> -output <file|screen>
+translator -gui -api_key <key> -free_api <true|false> -input_string <text> -input_file <path> -output_file <path> -source_lang <lang_code> -target_lang <lang_code> -output <file|screen>
 ```
+
+### gui
+
+Optional. If you add the `-gui` flag, it will start the GUI version of the application.
 
 ### api_key
 
@@ -135,6 +152,16 @@ translator -input_file "example.txt" -output_file "translated_example.txt" -api_
 ```
 
 It will only output the translated text to the screen and won't create a translation file. So in this case, it's not necessary to use the `-output_file` flag.
+
+## History
+
+### v1.0.0
+
+- Initial release
+
+### v1.1.0
+
+- Added GUI support
 
 ## License
 
